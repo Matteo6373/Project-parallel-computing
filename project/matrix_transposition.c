@@ -25,7 +25,7 @@ void matTranspose(int n,double M[n][n],double T[n][n]){
 }
 
 void matTransposeImp(int n,double M[n][n],double T[n][n]){
-    int i,j,k,l,blocksize=16;
+    int i,j,k,l,blocksize=64;
     #pragma simd
     for (i = 0; i < n; i += blocksize) {
       for (j = 0; j < n; j += blocksize) {
@@ -43,11 +43,10 @@ void matTransposeOMP(int n,double M[n][n],double T[n][n],int* n_threads){
 #ifdef _OPENMP
     #pragma omp parallel
     {
-        *n_threads = omp_get_num_threads();  // Store the number of threads
+        *n_threads = omp_get_num_threads(); 
         int i, j, l,k;
-        int blocksize = 64;  // Example block size, tune for your system
-         #pragma omp for schedule(static) collapse(2)
-        // Parallelize the blocks
+        int blocksize = 64;  
+        #pragma omp for schedule(static) collapse(2)
         for (i = 0; i < n; i += blocksize) {
           for (j = 0; j < n; j += blocksize) {
             for (l = j; l < j + blocksize;l++) {
