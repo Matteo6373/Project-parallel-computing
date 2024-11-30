@@ -1,0 +1,44 @@
+#!/bin/bash
+# Job name
+#PBS -N helloc
+# Output files
+#PBS -o ./mt_flags.o
+#PBS -e ./mt.e
+# Queue name
+#PBS -q short_cpuQ
+# Set the maximum wall time
+#PBS -l walltime=0:20:00
+# Number of nodes, cpus, and amount of memory
+#PBS -l select=1:ncpus=8:mem=1gb
+
+# Modules for C
+module load gcc91
+# Define gcc and g++ to use the version 9.1.0
+gcc() {
+    gcc-9.1.0 "$@"
+}
+cd project/
+export OMP_NUM_THREADS=4
+echo "flags none "
+echo "------------------------------------------------------------------------------------------------------------------------"
+echo "------------------------------------------------------------------------------------------------------------------------"
+gcc matrix_transposition.c -o mt -fopenmp 
+./mt 1024
+./mt 1024
+./mt 1024
+echo "flags -O1 "
+echo "------------------------------------------------------------------------------------------------------------------------"
+echo "------------------------------------------------------------------------------------------------------------------------"
+gcc matrix_transposition.c -o mt -fopenmp -O1
+./mt 1024
+./mt 1024
+./mt 1024
+echo "flags -O2 "
+echo "------------------------------------------------------------------------------------------------------------------------"
+echo "------------------------------------------------------------------------------------------------------------------------"
+gcc matrix_transposition.c -o mt -fopenmp -O2
+./mt 1024
+./mt 1024
+./mt 1024
+
+
