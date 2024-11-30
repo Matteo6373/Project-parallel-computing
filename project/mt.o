@@ -1,4 +1,3 @@
-
 NUMBER OF THREADS= 1      MATRIX SIZE = 16
              |  sequential time   |    implicit time    |     explicit time   |     speedup         |      efficiency
 -----------------------------------------------------------------------------------------------------------------------------
