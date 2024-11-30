@@ -29,9 +29,9 @@ void matTransposeImp(int n,double M[n][n],double T[n][n]){
     #pragma simd
     for (i = 0; i < n; i += blocksize) {
       for (j = 0; j < n; j += blocksize) {
-        for (l = j; l < j + blocksize;l++) {
+        for (l = j; l < j + blocksize && l < n;l++) {
           #pragma unroll(16)
-          for (k = i; k < i + blocksize;k++) {
+          for (k = i; k < i + blocksize && k < n;k++) {
                   T[l][k] = M[k][l];
           }
         }
@@ -43,14 +43,16 @@ void matTransposeOMP(int n,double M[n][n],double T[n][n],int* n_threads){
 #ifdef _OPENMP
     #pragma omp parallel
     {
-        *n_threads = omp_get_num_threads(); 
-        int i, j, l,k;
-        int blocksize = 64;  
+        #pragma omp single
+        {
+        *n_threads = omp_get_num_threads();
+        } 
+        int i, j, l,k,blocksize=64;  
         #pragma omp for schedule(static) collapse(2)
         for (i = 0; i < n; i += blocksize) {
           for (j = 0; j < n; j += blocksize) {
-            for (l = j; l < j + blocksize;l++) {
-              for (k = i; k < i + blocksize;k++) {
+            for (l = j; l < j + blocksize && l < n;l++) {
+              for (k = i; k < i + blocksize && k < n;k++) {
                   T[l][k] = M[k][l];
               }
             }
