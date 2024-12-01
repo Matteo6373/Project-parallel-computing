@@ -1,4 +1,4 @@
-The code was tested on the cluster on a node with the following specifications. To run the code, simply copy the folder to the cluster and execute the file mt.pbs from within the copied folder. This will recompile and run the matrix_transposition.c code for each pair of matrix size and number of threads. Running all combinations takes about ten minutes. Invece per eseguire il codice con size e n_threads definiti caricare il modulo gcc91, poi compilare il codice con gcc matrix_transposition.c -o mt -fopenmp -O2 , infine eseguirlo con ./mt (size)
+The code was tested on the cluster on a node with the following specifications. To run the code, simply copy the folder to the cluster and execute the file mt.pbs from within the copied folder. This will recompile and run the matrix_transposition.c code for each pair of matrix size and number of threads. Running all combinations takes about ten minutes. Invece per eseguire il codice con size e n_threads definiti caricare il modulo gcc91, poi compilare il codice con gcc matrix_transposition.c -o mt -fopenmp -O2 , infine eseguirlo con ./mt (size) es.(./mt 1024)
 
 
 gcc-9.1.0 (GCC) 9.1.0
