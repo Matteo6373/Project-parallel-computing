@@ -1,10 +1,11 @@
 The code was tested on the cluster on a node with the following specifications. To run the code, simply copy the folder to the cluster and execute the file mt.pbs from within the copied folder. This will recompile and run the matrix_transposition.c code for each pair of matrix size and number of threads. Running all combinations takes about ten minutes.  To execute the code with defined size and n_threads, first load the gcc91 module, then compile the code with gcc matrix_transposition.c -o mt -fopenmp -O2, and finally run it with ./mt (size), e.g., ./mt 1024.
-
+----------------------------------------------------------------------------
+compiler version:
 gcc-9.1.0 (GCC) 9.1.0
 Copyright (C) 2019 Free Software Foundation, Inc.
 This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-
+----------------------------------------------------------------------------
 Architecture:          x86_64
 CPU op-mode(s):        32-bit, 64-bit
 Byte Order:            Little Endian
