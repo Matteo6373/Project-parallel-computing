@@ -15,16 +15,16 @@ int checkSym(int n,double M[n][n]){
     }
     return 1;//the matrix is simmetric
 }
-void matTranspose(int n,double M[n][n],double T[n][n]){
+void matTranspose(int n,double source[n][n],double dest[n][n]){
     int i,j;
     for (i = 0; i < n; i++) {
         for(j = 0; j < n; j++) {
-                T[i][j] = M[j][i];
+                dest[i][j] = source[j][i];
         }
     }
 }
 
-void matTransposeImp(int n,double M[n][n],double T[n][n]){
+void matTransposeImp(int n,double source[n][n],double dest[n][n]){
     int i,j,k,l,blocksize=64;
     #pragma simd
     for (i = 0; i < n; i += blocksize) {
@@ -32,14 +32,14 @@ void matTransposeImp(int n,double M[n][n],double T[n][n]){
         for (l = j; l < j + blocksize && l < n;l++) {
           #pragma unroll(16)
           for (k = i; k < i + blocksize && k < n;k++) {
-                  T[l][k] = M[k][l];
+                  dest[l][k] = source[k][l];
           }
         }
       }
     }
 }
 
-void matTransposeOMP(int n,double M[n][n],double T[n][n],int* n_threads){
+void matTransposeOMP(int n,double source[n][n],double dest[n][n],int* n_threads){
 #ifdef _OPENMP
     #pragma omp parallel
     {
@@ -53,7 +53,7 @@ void matTransposeOMP(int n,double M[n][n],double T[n][n],int* n_threads){
           for (j = 0; j < n; j += blocksize) {
             for (l = j; l < j + blocksize && l < n;l++) {
               for (k = i; k < i + blocksize && k < n;k++) {
-                  T[l][k] = M[k][l];
+                  dest[l][k] = source[k][l];
               }
             }
           }
@@ -62,6 +62,15 @@ void matTransposeOMP(int n,double M[n][n],double T[n][n],int* n_threads){
 #endif
 }
 
+int check(int n,double m1[n][n],double m2[n][n]){
+  int i,j;
+  for(i=0;i<n;i++){
+    for(j=0;j<n;j++){
+      if(m1[i][j]!=m2[i][j]) return 0;
+    }
+   }
+   return 1;
+}
 
 int main(int argc, char *argv[]){
     srand(time(NULL));
@@ -70,30 +79,31 @@ int main(int argc, char *argv[]){
     //take dimension as input
     if(argc!=2){printf("inserisci dimensione array\n");return 0;}
     int n = atoi(argv[1]);
-    double M[n][n];;  // Declare matrices M
-    double T[n][n];;  // Declare matrices T
+    double source[n][n];  // Declare matrices 
+    double dest_seq[n][n];  // Declare matrices
+    double dest_imp[n][n];
+    double dest_exp[n][n]; 
     double Time_Sequential[TRY]; //array with time for sequential
     double Time_Implicit[TRY];   //array with time for implicit
     double Time_Explicit[TRY];   //array with time for explicit
     int k;
     for(k=0;k<TRY+1;k++){
     
-      // Initialize matrices M with random values
+      // Initialize matrices source with random values
       for (i = 0; i < n; i++) {
           for(j = 0; j < n; j++) {
-              M[i][j] = (rand()%10000)/100.0;
+              source[i][j] = (rand()%10000)/100.0;
           }
       }
       
-  
       //check for symmetric matrix
-      if(checkSym(n,M)==1)
+      if(checkSym(n,source)==1)
           printf("matrice simmetrica\n");
       else{
           //---------------------------------------------------------------------------    
           //SEQUENTIAL PART  
           double wt1=omp_get_wtime();
-          matTranspose(n,M,T);
+          matTranspose(n,source,dest_seq);
           double wt2=omp_get_wtime();
           
           //save time in array
@@ -104,7 +114,7 @@ int main(int argc, char *argv[]){
           //IMPLICIT PART
 #ifdef _OPENMP          
           wt1=omp_get_wtime();
-          matTransposeImp(n,M,T);
+          matTransposeImp(n,source,dest_imp);
           wt2=omp_get_wtime();
           
           //save time in array
@@ -118,7 +128,7 @@ int main(int argc, char *argv[]){
           //EXPLICIT PART
 #ifdef _OPENMP
           wt1=omp_get_wtime();
-          matTransposeOMP(n,M,T,&n_threads);
+          matTransposeOMP(n,source,dest_exp,&n_threads);
           wt2=omp_get_wtime();
           
           //save time in array
@@ -164,24 +174,22 @@ int main(int argc, char *argv[]){
     
     
   
-    
-    /*
-    //parte per controllare la correttezza 
-    for (i = 0; i < n; i++) {
-        for(j = 0; j < n; j++) {
-            printf("%.2f ",M[i][j]);
-        }
-        printf("\n");
+    /* //controllo sicurezza
+    if(check(n,dest_seq,dest_exp)==0){
+      printf("sbagliato");
     }
-    printf("-------------------\n");
-    for (i = 0; i < n; i++) {
-        for(j = 0; j < n; j++) {
-            printf("%.2f ",T[i][j]);
-        }
-        printf("\n");
+    else{
+      printf("giusto");
+    }
+    if(check(n,dest_seq,dest_imp)==0){
+      printf("sbagliato");
+    }
+    else{
+      printf("giusto");
     }
     */
-        
+       
+    
 
     return 0;
 }
